@@ -1,6 +1,15 @@
 import { defineStore } from "pinia";
 import { useCookie } from "#app";
 
+export interface Menu {
+    id: string;
+    name: string;
+    url: string;
+    image?: string;
+    addedAt: string;
+    lastVisited: string;
+}
+
 export const useMenuStore = defineStore("menu", () => {
     const menus = ref<Menu[]>([]);
 
@@ -21,7 +30,7 @@ export const useMenuStore = defineStore("menu", () => {
         { deep: true }
     );
 
-    // Load from cookie (runs on both server & client)
+    // Load from cookie
     if (menuCookie.value) {
         menus.value = menuCookie.value;
     }
@@ -29,6 +38,14 @@ export const useMenuStore = defineStore("menu", () => {
     // Actions
     const addMenu = (url: string, image?: string) => {
         try {
+            // Check if URL already exists
+            const existingMenu = menus.value.find(m => m.url === url.trim());
+            if (existingMenu) {
+                // Update last visited instead of adding duplicate
+                existingMenu.lastVisited = new Date().toISOString();
+                return existingMenu;
+            }
+
             const hostname = new URL(url).hostname.replace("www.", "");
             const baseName = hostname.split(".")[0];
 
@@ -49,6 +66,15 @@ export const useMenuStore = defineStore("menu", () => {
         }
     };
 
+    const addMultipleMenus = (urls: string[]) => {
+        const added: Menu[] = [];
+        urls.forEach(url => {
+            const result = addMenu(url);
+            if (result) added.push(result);
+        });
+        return added;
+    };
+
     const removeMenu = (id: string) => {
         menus.value = menus.value.filter((m) => m.id !== id);
     };
@@ -66,6 +92,7 @@ export const useMenuStore = defineStore("menu", () => {
     return {
         menus,
         addMenu,
+        addMultipleMenus,
         removeMenu,
         updateLastVisited,
         updateMenuImage,
