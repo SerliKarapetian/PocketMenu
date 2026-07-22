@@ -93,8 +93,6 @@ const handleSearch = (term: string) => {
 };
 
 const deleteMenu = (id: string) => {
-  if (confirm("Delete this menu?")) {
-    menuStore.removeMenu(id);
-  }
+  menuStore.removeMenu(id);
 };
 </script>
