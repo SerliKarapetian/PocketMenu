@@ -51,7 +51,7 @@ export const useMenuStore = defineStore("menu", () => {
 
             const newMenu: Menu = {
                 id: Date.now().toString(36) + Math.random().toString(36).substr(2, 8),
-                name: baseName.charAt(0).toUpperCase() + baseName.slice(1) + " Menu",
+                name: baseName.charAt(0).toUpperCase() + baseName.slice(1) , //+ " Menu"
                 url: url.trim(),
                 image: image,
                 addedAt: new Date().toISOString(),
