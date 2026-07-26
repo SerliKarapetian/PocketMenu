@@ -90,7 +90,13 @@
 <script setup lang="ts">
 import { useMenuStore } from "~/stores/menu";
 
-definePageMeta({ layout: "default" });
+definePageMeta({
+  layout: "default",
+  layoutConfig: {
+    showBackButton: false,
+    pageTitle: "",
+  },
+});
 
 const menuStore = useMenuStore();
 const searchTerm = ref("");

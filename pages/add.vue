@@ -29,6 +29,14 @@
 <script setup lang="ts">
 import { useMenuStore } from "~/stores/menu";
 
+definePageMeta({
+  layout: "default",
+  layoutConfig: {
+    pageTitle: "Add Menu",
+    showBackButton: true,
+  },
+});
+
 const menuStore = useMenuStore();
 const router = useRouter();
 
