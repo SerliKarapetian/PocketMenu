@@ -39,18 +39,31 @@ definePageMeta({
 
 const menuStore = useMenuStore();
 const router = useRouter();
+const { $toast } = useNuxtApp();
 
 const handleScanned = (url: string) => {
   const result = menuStore.addMenu(url);
+
   if (result) {
+    $toast.success("Menu added successfully!");
     router.push("/");
+  } else {
+    $toast.error("Invalid URL. Please try again.");
   }
 };
 
 const addLinks = (urls: string[]) => {
   const added = menuStore.addMultipleMenus(urls);
+
   if (added.length > 0) {
+    $toast.success(
+      added.length === 1
+        ? "1 menu added successfully!"
+        : `${added.length} menus added successfully!`,
+    );
     router.push("/");
+  } else {
+    $toast.error("No valid URLs found.");
   }
 };
 </script>

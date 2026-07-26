@@ -114,7 +114,7 @@
 import type { Menu } from "~/types/menu";
 import { useMenuStore } from "~/stores/menu";
 import { useDropdownStore } from "~/stores/dropdown";
-
+const { $toast } = useNuxtApp();
 const props = defineProps<{
   menu: Menu;
 }>();
@@ -179,10 +179,12 @@ const closeEditModal = () => {
 };
 
 const saveEdit = (updatedMenu: Menu) => {
-  // Update the menu in the store
-  const index = menuStore.menus.findIndex((m) => m.id === updatedMenu.id);
-  if (index !== -1) {
-    menuStore.menus[index] = updatedMenu;
+  const success = menuStore.updateMenu(updatedMenu);
+
+  if (success) {
+    $toast.success("Menu updated successfully!");
+  } else {
+    $toast.error("Failed to update menu.");
   }
   closeEditModal();
 };
@@ -199,6 +201,7 @@ const closeDeleteModal = () => {
 const confirmDelete = () => {
   closeDeleteModal();
   emit("delete", props.menu.id);
+  $toast.success(`"${props.menu.name}" deleted`);
 };
 
 // Close dropdown when clicking outside
