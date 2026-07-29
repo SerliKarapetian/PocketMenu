@@ -37,33 +37,75 @@ definePageMeta({
   },
 });
 
+const { $toast } = useNuxtApp();
 const menuStore = useMenuStore();
 const router = useRouter();
-const { $toast } = useNuxtApp();
 
 const handleScanned = (url: string) => {
   const result = menuStore.addMenu(url);
 
   if (result) {
-    $toast.success("Menu added successfully!");
+    if (result.isDuplicate) {
+      $toast.info(
+        `"${result.menu.name}" already exists - updated last visited`,
+      );
+    } else {
+      $toast.success(`"${result.menu.name}" added successfully!`);
+    }
     router.push("/");
   } else {
-    $toast.error("Invalid URL. Please try again.");
+    $toast.error("Invalid URL. Please check the link and try again.");
   }
 };
 
 const addLinks = (urls: string[]) => {
-  const added = menuStore.addMultipleMenus(urls);
+  const { added, duplicates, failed } = menuStore.addMultipleMenus(urls);
 
-  if (added.length > 0) {
+  // different scenarios
+  if (added.length > 0 && duplicates.length === 0 && failed === 0) {
+    // All added successfully
     $toast.success(
-      added.length === 1
-        ? "1 menu added successfully!"
-        : `${added.length} menus added successfully!`,
+      `Added ${added.length} menu${added.length > 1 ? "s" : ""} successfully!`,
     );
     router.push("/");
+  } else if (added.length > 0 && duplicates.length > 0 && failed === 0) {
+    // Some added, some duplicates
+    $toast.warning(
+      `Added ${added.length} menu${added.length > 1 ? "s" : ""}, ${duplicates.length} already existed`,
+    );
+    router.push("/");
+  } else if (added.length === 0 && duplicates.length > 0 && failed === 0) {
+    // All duplicates
+    $toast.info(
+      `All ${duplicates.length} menu${duplicates.length > 1 ? "s" : ""} already exist - updated last visited`,
+    );
+    router.push("/");
+  } else if (added.length > 0 && duplicates.length === 0 && failed > 0) {
+    // Some added, some failed
+    $toast.warning(
+      `Added ${added.length} menu${added.length > 1 ? "s" : ""}, ${failed} failed`,
+    );
+    router.push("/");
+  } else if (added.length === 0 && duplicates.length === 0 && failed > 0) {
+    // All failed
+    $toast.error(
+      `Failed to add ${failed} menu${failed > 1 ? "s" : ""}. Please check your links.`,
+    );
   } else {
-    $toast.error("No valid URLs found.");
+    // Mixed results
+    let message = "";
+    if (added.length > 0)
+      message += `Added ${added.length} menu${added.length > 1 ? "s" : ""}`;
+    if (duplicates.length > 0) {
+      if (message) message += ", ";
+      message += `${duplicates.length} already existed`;
+    }
+    if (failed > 0) {
+      if (message) message += ", ";
+      message += `${failed} failed`;
+    }
+    $toast.warning(message);
+    router.push("/");
   }
 };
 </script>

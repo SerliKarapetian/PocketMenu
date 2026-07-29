@@ -16,7 +16,7 @@ export const useMenuStore = defineStore("menu", () => {
     // Persistent cookie
     const menuCookie = useCookie<Menu[]>("pocketmenu-menus", {
         default: () => [],
-        maxAge: 60 * 60 * 24 * 365, // 1 year
+        maxAge: 60 * 60 * 24 * 365,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
     });
@@ -43,7 +43,10 @@ export const useMenuStore = defineStore("menu", () => {
             if (existingMenu) {
                 // Update last visited instead of adding duplicate
                 existingMenu.lastVisited = new Date().toISOString();
-                return existingMenu;
+                return { 
+                    menu: existingMenu, 
+                    isDuplicate: true 
+                };
             }
 
             const hostname = new URL(url).hostname.replace("www.", "");
@@ -51,7 +54,7 @@ export const useMenuStore = defineStore("menu", () => {
 
             const newMenu: Menu = {
                 id: Date.now().toString(36) + Math.random().toString(36).substr(2, 8),
-                name: baseName.charAt(0).toUpperCase() + baseName.slice(1), //+ " Menu"
+                name: baseName.charAt(0).toUpperCase() + baseName.slice(1) + " Menu",
                 url: url.trim(),
                 image: image,
                 addedAt: new Date().toISOString(),
@@ -59,7 +62,10 @@ export const useMenuStore = defineStore("menu", () => {
             };
 
             menus.value.unshift(newMenu);
-            return newMenu;
+            return { 
+                menu: newMenu, 
+                isDuplicate: false 
+            };
         } catch (e) {
             return null;
         }
@@ -67,13 +73,23 @@ export const useMenuStore = defineStore("menu", () => {
 
     const addMultipleMenus = (urls: string[]) => {
         const added: Menu[] = [];
+        const duplicates: Menu[] = [];
+        let failed = 0;
+        
         urls.forEach(url => {
             const result = addMenu(url);
             if (result) {
-                added.push(result);
+                if (result.isDuplicate) {
+                    duplicates.push(result.menu);
+                } else {
+                    added.push(result.menu);
+                }
+            } else {
+                failed++;
             }
         });
-        return added;
+        
+        return { added, duplicates, failed };
     };
 
     const removeMenu = (id: string) => {
