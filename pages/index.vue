@@ -99,6 +99,8 @@ definePageMeta({
 });
 
 const menuStore = useMenuStore();
+const { $toast } = useNuxtApp();
+
 const searchTerm = ref("");
 const showSortOptions = ref(false);
 const sortBy = ref<"newest" | "oldest" | "az" | "za" | "lastVisited">("newest");
