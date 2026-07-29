@@ -4,12 +4,16 @@
     class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[200] p-4"
     @click.self="close"
   >
-    <div class="bg-white dark:bg-gray-900 rounded-3xl p-6 max-w-md w-full shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
+    <div
+      class="bg-white dark:bg-gray-900 rounded-3xl p-6 max-w-md w-full shadow-2xl mx-4 max-h-[90vh] overflow-y-auto"
+    >
       <h3 class="text-xl font-bold mb-4">Edit Menu</h3>
-      
+
       <!-- Menu Name -->
       <div class="mb-4">
-        <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+        <label
+          class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
+        >
           Menu Name
         </label>
         <input
@@ -23,7 +27,9 @@
 
       <!-- Menu URL -->
       <div class="mb-4">
-        <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+        <label
+          class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
+        >
           Menu URL
         </label>
         <input
@@ -36,10 +42,12 @@
 
       <!-- Menu Image -->
       <div class="mb-4">
-        <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+        <label
+          class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
+        >
           Menu Image
         </label>
-        
+
         <!-- Image Preview -->
         <div v-if="form.image" class="relative mb-3">
           <img
@@ -71,9 +79,7 @@
             <Icon name="mdi:eye" class="w-5 h-5" />
           </button>
         </div>
-        <p class="text-xs text-gray-500 mt-1">
-          Paste a direct image URL
-        </p>
+        <p class="text-xs text-gray-500 mt-1">Paste a direct image URL</p>
       </div>
 
       <!-- Action Buttons -->
@@ -103,6 +109,7 @@ interface Props {
   menu: Menu;
 }
 
+const { $toast } = useNuxtApp();
 const props = defineProps<Props>();
 const emit = defineEmits<{
   close: [];
@@ -112,62 +119,66 @@ const emit = defineEmits<{
 const form = reactive({
   name: props.menu.name,
   url: props.menu.url,
-  image: props.menu.image || '',
+  image: props.menu.image || "",
 });
 
 // Reset form when menu changes or modal opens
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen) {
-    form.name = props.menu.name;
-    form.url = props.menu.url;
-    form.image = props.menu.image || '';
-  }
-}, { immediate: true });
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen) {
+      form.name = props.menu.name;
+      form.url = props.menu.url;
+      form.image = props.menu.image || "";
+    }
+  },
+  { immediate: true },
+);
 
 const close = () => {
-  emit('close');
+  emit("close");
 };
 
 const save = () => {
   if (!form.name.trim()) {
-    alert('Please enter a menu name');
+    $toast.error("Please enter a menu name");
     return;
   }
-  
+
   if (!form.url.trim()) {
-    alert('Please enter a menu URL');
+    $toast.error("Please enter a menu URL");
     return;
   }
-  
+
   const updatedMenu: Menu = {
     ...props.menu,
     name: form.name.trim(),
     url: form.url.trim(),
     image: form.image || undefined,
   };
-  
-  emit('save', updatedMenu);
+
+  emit("save", updatedMenu);
 };
 
 // Preview image in a new tab
 const previewImage = () => {
   if (form.image) {
-    window.open(form.image, '_blank');
+    window.open(form.image, "_blank");
   }
 };
 
 // Handle escape key
 const handleEscape = (e: KeyboardEvent) => {
-  if (e.key === 'Escape' && props.isOpen) {
+  if (e.key === "Escape" && props.isOpen) {
     close();
   }
 };
 
 onMounted(() => {
-  document.addEventListener('keydown', handleEscape);
+  document.addEventListener("keydown", handleEscape);
 });
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleEscape);
+  document.removeEventListener("keydown", handleEscape);
 });
 </script>

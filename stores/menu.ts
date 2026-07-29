@@ -2,12 +2,12 @@ import { defineStore } from "pinia";
 import { useCookie } from "#app";
 
 export interface Menu {
-    id: string;
-    name: string;
-    url: string;
-    image?: string;
-    addedAt: string;
-    lastVisited: string;
+  id: string;
+  name: string;
+  url: string;
+  image?: string;
+  addedAt: string;
+  lastVisited: string;
 }
 
 export const useMenuStore = defineStore("menu", () => {
@@ -51,7 +51,7 @@ export const useMenuStore = defineStore("menu", () => {
 
             const newMenu: Menu = {
                 id: Date.now().toString(36) + Math.random().toString(36).substr(2, 8),
-                name: baseName.charAt(0).toUpperCase() + baseName.slice(1) , //+ " Menu"
+                name: baseName.charAt(0).toUpperCase() + baseName.slice(1), //+ " Menu"
                 url: url.trim(),
                 image: image,
                 addedAt: new Date().toISOString(),
@@ -61,7 +61,6 @@ export const useMenuStore = defineStore("menu", () => {
             menus.value.unshift(newMenu);
             return newMenu;
         } catch (e) {
-            alert("Please enter a valid URL");
             return null;
         }
     };
@@ -70,23 +69,44 @@ export const useMenuStore = defineStore("menu", () => {
         const added: Menu[] = [];
         urls.forEach(url => {
             const result = addMenu(url);
-            if (result) added.push(result);
+            if (result) {
+                added.push(result);
+            }
         });
         return added;
     };
 
     const removeMenu = (id: string) => {
-        menus.value = menus.value.filter((m) => m.id !== id);
+        const menu = menus.value.find((m) => m.id === id);
+        if (menu) {
+            menus.value = menus.value.filter((m) => m.id !== id);
+            return menu;
+        }
+        return null;
+    };
+
+    // Update a menu
+    const updateMenu = (updatedMenu: Menu) => {
+        const index = menus.value.findIndex((m) => m.id === updatedMenu.id);
+        if (index !== -1) {
+            menus.value[index] = updatedMenu;
+            return true;
+        }
+        return false;
     };
 
     const updateLastVisited = (id: string) => {
         const menu = menus.value.find((m) => m.id === id);
-        if (menu) menu.lastVisited = new Date().toISOString();
+        if (menu) {
+            menu.lastVisited = new Date().toISOString();
+        }
     };
 
     const updateMenuImage = (id: string, imageUrl: string) => {
         const menu = menus.value.find((m) => m.id === id);
-        if (menu) menu.image = imageUrl;
+        if (menu) {
+            menu.image = imageUrl;
+        }
     };
 
     return {
@@ -94,6 +114,7 @@ export const useMenuStore = defineStore("menu", () => {
         addMenu,
         addMultipleMenus,
         removeMenu,
+        updateMenu,
         updateLastVisited,
         updateMenuImage,
     };
