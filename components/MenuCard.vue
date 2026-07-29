@@ -1,6 +1,7 @@
 <template>
   <div
-    class="bg-white dark:bg-gray-900 rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:shadow-xl transition group h-full flex flex-col"
+    class="bg-white dark:bg-gray-900 rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:shadow-xl transition group h-full flex flex-col cursor-pointer"
+    @click="openMenu"
   >
     <!-- Image Area -->
     <div
@@ -10,11 +11,11 @@
         v-if="menu.image"
         :src="menu.image"
         :alt="menu.name"
-        class="w-full h-full object-cover"
+        class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
       />
       <div
         v-else
-        class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl shadow-inner"
+        class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl shadow-inner group-hover:scale-110 transition duration-300"
       >
         🍽️
       </div>
@@ -35,7 +36,7 @@
     <!-- Content Section -->
     <div class="p-3.5 sm:p-5 flex-1 flex flex-col">
       <h3
-        class="font-semibold text-base sm:text-lg md:text-xl mb-1 line-clamp-2 leading-tight"
+        class="font-semibold text-base sm:text-lg md:text-xl mb-1 line-clamp-2 leading-tight group-hover:text-slate-600 dark:group-hover:text-slate-400 transition-colors"
       >
         {{ menu.name }}
       </h3>
@@ -98,6 +99,7 @@
       :menu="menu"
       @close="closeEditModal"
       @save="saveEdit"
+      @click.native.stop
     />
 
     <!-- Delete Modal -->
@@ -106,6 +108,7 @@
       :menu-name="menu.name"
       @close="closeDeleteModal"
       @confirm="confirmDelete"
+      @click.native.stop
     />
   </div>
 </template>
@@ -114,7 +117,9 @@
 import type { Menu } from "~/types/menu";
 import { useMenuStore } from "~/stores/menu";
 import { useDropdownStore } from "~/stores/dropdown";
+
 const { $toast } = useNuxtApp();
+
 const props = defineProps<{
   menu: Menu;
 }>();
@@ -125,6 +130,7 @@ const emit = defineEmits<{
 
 const menuStore = useMenuStore();
 const dropdownStore = useDropdownStore();
+const router = useRouter();
 
 const showEditModal = ref(false);
 const showDeleteModal = ref(false);
@@ -132,12 +138,29 @@ const dropdownRef = ref<HTMLElement | null>(null);
 const buttonRef = ref<HTMLElement | null>(null);
 const dropdownStyle = ref<Record<string, string>>({});
 
+const isAnyModalOpen = computed(
+  () => showEditModal.value || showDeleteModal.value,
+);
+
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
+};
+
+// Prevent open menu function when modal is open
+const openMenu = (e: MouseEvent) => {
+  if (isAnyModalOpen.value) {
+    e.stopPropagation();
+    return;
+  }
+
+  // Update last visited time
+  menuStore.updateLastVisited(props.menu.id);
+  // Navigate to the menu page
+  router.push(`/menu/${props.menu.id}`);
 };
 
 const positionDropdown = () => {
@@ -182,7 +205,7 @@ const saveEdit = (updatedMenu: Menu) => {
   const success = menuStore.updateMenu(updatedMenu);
 
   if (success) {
-    $toast.success("Menu updated successfully!");
+    $toast.success(`"${updatedMenu.name}" updated successfully!`);
   } else {
     $toast.error("Failed to update menu.");
   }
@@ -224,6 +247,8 @@ const handleClickOutside = (e: MouseEvent) => {
 const handleEscape = (e: KeyboardEvent) => {
   if (e.key === "Escape") {
     if (dropdownStore.isOpen(props.menu.id)) close();
+    if (showEditModal.value) closeEditModal();
+    if (showDeleteModal.value) closeDeleteModal();
   }
 };
 
