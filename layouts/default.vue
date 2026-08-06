@@ -1,3 +1,4 @@
+<!-- layouts/default.vue -->
 <template>
   <div
     class="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100"
@@ -37,20 +38,9 @@
             {{ pageTitle }}
           </div>
 
-          <!-- //todo : add the theme change action -->
-          <!-- Right side - Actions  -->
+          <!-- Right side - Actions -->
           <div class="flex items-center gap-2 min-w-[100px] justify-end">
-            <button
-              v-if="showThemeToggle"
-              @click="toggleTheme"
-              class="flex p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Toggle theme"
-            >
-              <Icon
-                :name="isDark ? 'mdi:weather-sunny' : 'mdi:weather-night'"
-                class="w-5 h-5"
-              />
-            </button>
+            <themeSwitch v-if="showThemeToggle" />
           </div>
         </div>
       </div>
@@ -67,8 +57,8 @@
 const route = useRoute();
 const router = useRouter();
 
-// Theme state
-const isDark = ref(false);
+// Use the theme composable
+const { initTheme, listenForSystemThemeChanges } = useTheme();
 
 // Get layout configuration from route meta
 const routeConfig = computed(() => {
@@ -104,26 +94,17 @@ const goBack = () => {
   }
 };
 
-// todo : optimize / fix theme actions later 
-// Toggle theme
-const toggleTheme = () => {
-  isDark.value = !isDark.value;
-  document.documentElement.classList.toggle("dark", isDark.value);
-  localStorage.setItem("theme", isDark.value ? "dark" : "light");
-};
-
-// Load theme preference
+// Initialize theme on mount
 onMounted(() => {
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") {
-    isDark.value = true;
-    document.documentElement.classList.add("dark");
-  } else if (savedTheme === "light") {
-    isDark.value = false;
-    document.documentElement.classList.remove("dark");
-  } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    isDark.value = true;
-    document.documentElement.classList.add("dark");
-  }
+  // Initialize theme from localStorage or system preference
+  initTheme();
+
+  // Listen for system theme changes (only if user hasn't set a preference)
+  const cleanup = listenForSystemThemeChanges();
+
+  // Cleanup on component unmount
+  onUnmounted(() => {
+    cleanup();
+  });
 });
 </script>
