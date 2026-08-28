@@ -16,12 +16,47 @@ export default defineNuxtConfig({
     storesDirs: ['./stores']
   },
 
+  i18n: {
+    vueI18n: './i18n.config.ts',
+    locales: [
+      {
+        code: 'fa',
+        language: 'fa-IR',
+        name: 'فارسی',
+        dir: 'rtl',
+        file: 'fa.json',
+      },
+      {
+        code: 'en',
+        language: 'en-US',
+        name: 'English',
+        dir: 'ltr',
+        file: 'en.json',
+      },
+    ],
+    defaultLocale: 'fa',
+    strategy: 'prefix',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root',
+      alwaysRedirect: false,
+      fallbackLocale: 'fa',
+    },
+    langDir: 'locales',
+    lazy: true,
+  },
+
   css: ['./assets/css/main.css'],
 
   vite: {
     plugins: [
       tailwindcss(),
     ],
+  },
+
+  router: {
+    middleware: ['i18n']
   },
 
   app: {
