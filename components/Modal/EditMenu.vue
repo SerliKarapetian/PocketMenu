@@ -7,20 +7,25 @@
     <div
       class="bg-white dark:bg-gray-900 rounded-3xl p-6 max-w-md w-full shadow-2xl mx-4 max-h-[90vh] overflow-y-auto"
     >
-      <h3 class="text-xl font-bold mb-4">Edit Menu</h3>
+      <h3 class="text-xl font-bold mb-4">{{ $t("modal.edit_title") }}</h3>
 
       <!-- Menu Name -->
       <div class="mb-4">
         <label
           class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
+          :class="{ 'text-right': isRtl }"
         >
-          Menu Name
+          {{ $t("modal.menu_name") }}
         </label>
         <input
           v-model="form.name"
           type="text"
           class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
-          placeholder="Enter menu name"
+          :class="{
+            'text-right': isRtl,
+            'text-left': !isRtl,
+          }"
+          :placeholder="$t('modal.enter_menu_name')"
           @keyup.enter="save"
         />
       </div>
@@ -29,14 +34,19 @@
       <div class="mb-4">
         <label
           class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
+          :class="{ 'text-right': isRtl }"
         >
-          Menu URL
+          {{ $t("modal.menu_url") }}
         </label>
         <input
           v-model="form.url"
           type="url"
           class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
-          placeholder="https://example.com/menu"
+          :class="{
+            'text-right': isRtl,
+            'text-left': !isRtl,
+          }"
+          :placeholder="$t('modal.enter_menu_url')"
         />
       </div>
 
@@ -44,32 +54,41 @@
       <div class="mb-4">
         <label
           class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
+          :class="{ 'text-right': isRtl }"
         >
-          Menu Image
+          {{ $t("modal.menu_image") }}
         </label>
 
         <!-- Image Preview -->
         <div v-if="form.image" class="relative mb-3">
           <img
             :src="form.image"
-            alt="Menu preview"
+            :alt="$t('modal.menu_preview')"
             class="w-full h-32 object-cover rounded-2xl"
           />
           <button
             @click="form.image = ''"
-            class="absolute flex top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition"
+            class="absolute flex top-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition"
+            :class="{
+              'left-2': isRtl,
+              'right-2': !isRtl,
+            }"
           >
             <Icon name="mdi:close" class="w-4 h-4" />
           </button>
         </div>
 
         <!-- Image URL Input -->
-        <div class="flex gap-2">
+        <div class="flex gap-2" :class="{ 'flex-row-reverse': isRtl }">
           <input
             v-model="form.image"
             type="url"
             class="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
-            placeholder="Paste image URL"
+            :class="{
+              'text-right': isRtl,
+              'text-left': !isRtl,
+            }"
+            :placeholder="$t('modal.paste_image_url')"
           />
           <button
             v-if="form.image"
@@ -79,22 +98,24 @@
             <Icon name="mdi:eye" class="w-5 h-5" />
           </button>
         </div>
-        <p class="text-xs text-gray-500 mt-1">Paste a direct image URL</p>
+        <p class="text-xs text-gray-500 mt-1" :class="{ 'text-right': isRtl }">
+          {{ $t("modal.paste_image_hint") }}
+        </p>
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex gap-3 mt-6">
+      <div class="flex gap-3 mt-6" :class="{ 'flex-row-reverse': isRtl }">
         <button
           @click="close"
           class="flex-1 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 py-3 rounded-2xl font-medium hover:bg-gray-300 dark:hover:bg-gray-700 transition"
         >
-          Cancel
+          {{ $t("modal.cancel") }}
         </button>
         <button
           @click="save"
           class="flex-1 bg-black dark:bg-white text-white dark:text-black py-3 rounded-2xl font-medium hover:scale-105 active:scale-95 transition"
         >
-          Save Changes
+          {{ $t("modal.save_changes") }}
         </button>
       </div>
     </div>
@@ -103,13 +124,17 @@
 
 <script setup lang="ts">
 import type { Menu } from "~/types/menu";
+import { useI18n } from "vue-i18n";
+
+const { t, locale } = useI18n();
+const { $toast } = useNuxtApp();
+const isRtl = computed(() => locale.value === "fa");
 
 interface Props {
   isOpen: boolean;
   menu: Menu;
 }
 
-const { $toast } = useNuxtApp();
 const props = defineProps<Props>();
 const emit = defineEmits<{
   close: [];
@@ -141,12 +166,12 @@ const close = () => {
 
 const save = () => {
   if (!form.name.trim()) {
-    $toast.error("Please enter a menu name");
+    $toast.error(t("modal.error_name_required"));
     return;
   }
 
   if (!form.url.trim()) {
-    $toast.error("Please enter a menu URL");
+    $toast.error(t("modal.error_url_required"));
     return;
   }
 

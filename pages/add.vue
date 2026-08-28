@@ -1,6 +1,8 @@
 <template>
   <div class="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
-    <h1 class="text-3xl sm:text-4xl font-bold mb-8">Add New Menu</h1>
+    <h1 class="text-3xl sm:text-4xl font-bold mb-8">
+      {{ $t("menu.add_menu") }}
+    </h1>
 
     <div class="space-y-10">
       <!-- QR Scanner -->
@@ -14,9 +16,9 @@
           ></div>
         </div>
         <div class="relative flex justify-center">
-          <span class="bg-white dark:bg-gray-900 px-6 text-sm text-gray-500"
-            >OR</span
-          >
+          <span class="bg-white dark:bg-gray-900 px-6 text-sm text-gray-500">{{
+            $t("add.or")
+          }}</span>
         </div>
       </div>
 
@@ -28,6 +30,11 @@
 
 <script setup lang="ts">
 import { useMenuStore } from "~/stores/menu";
+import { useI18n } from "vue-i18n";
+
+const { t, locale } = useI18n();
+const localePath = useLocalePath();
+const isRtl = computed(() => locale.value === "fa");
 
 definePageMeta({
   layout: "default",
@@ -46,66 +53,93 @@ const handleScanned = (url: string) => {
 
   if (result) {
     if (result.isDuplicate) {
-      $toast.info(
-        `"${result.menu.name}" already exists - updated last visited`,
-      );
+      $toast.info(t("toast.duplicate", { name: result.menu.name }));
     } else {
-      $toast.success(`"${result.menu.name}" added successfully!`);
+      $toast.success(t("toast.added", { name: result.menu.name }));
     }
-    router.push("/");
+    router.push(localePath("/"));
   } else {
-    $toast.error("Invalid URL. Please check the link and try again.");
+    $toast.error(t("toast.invalid_url"));
   }
 };
 
 const addLinks = (urls: string[]) => {
   const { added, duplicates, failed } = menuStore.addMultipleMenus(urls);
 
-  // different scenarios
+  // All added successfully
   if (added.length > 0 && duplicates.length === 0 && failed === 0) {
-    // All added successfully
     $toast.success(
-      `Added ${added.length} menu${added.length > 1 ? "s" : ""} successfully!`,
+      t(`toast.added_${added.length === 1 ? "one" : "other"}`, {
+        count: added.length,
+      }),
     );
-    router.push("/");
-  } else if (added.length > 0 && duplicates.length > 0 && failed === 0) {
-    // Some added, some duplicates
+    router.push(localePath("/"));
+  }
+  // Some added, some duplicates
+  else if (added.length > 0 && duplicates.length > 0 && failed === 0) {
     $toast.warning(
-      `Added ${added.length} menu${added.length > 1 ? "s" : ""}, ${duplicates.length} already existed`,
+      t(`toast.added_with_duplicates_${added.length === 1 ? "one" : "other"}`, {
+        added: added.length,
+        duplicates: duplicates.length,
+      }),
     );
-    router.push("/");
-  } else if (added.length === 0 && duplicates.length > 0 && failed === 0) {
-    // All duplicates
+    router.push(localePath("/"));
+  }
+  // All duplicates
+  else if (added.length === 0 && duplicates.length > 0 && failed === 0) {
     $toast.info(
-      `All ${duplicates.length} menu${duplicates.length > 1 ? "s" : ""} already exist - updated last visited`,
+      t(`toast.all_duplicates_${duplicates.length === 1 ? "one" : "other"}`, {
+        count: duplicates.length,
+      }),
     );
-    router.push("/");
-  } else if (added.length > 0 && duplicates.length === 0 && failed > 0) {
-    // Some added, some failed
+    router.push(localePath("/"));
+  }
+  // Some added, some failed
+  else if (added.length > 0 && duplicates.length === 0 && failed > 0) {
     $toast.warning(
-      `Added ${added.length} menu${added.length > 1 ? "s" : ""}, ${failed} failed`,
+      t(`toast.added_with_failed_${added.length === 1 ? "one" : "other"}`, {
+        added: added.length,
+        failed: failed,
+      }),
     );
-    router.push("/");
-  } else if (added.length === 0 && duplicates.length === 0 && failed > 0) {
-    // All failed
+    router.push(localePath("/"));
+  }
+  // All failed
+  else if (added.length === 0 && duplicates.length === 0 && failed > 0) {
     $toast.error(
-      `Failed to add ${failed} menu${failed > 1 ? "s" : ""}. Please check your links.`,
+      t(`toast.all_failed_${failed === 1 ? "one" : "other"}`, {
+        count: failed,
+      }),
     );
-  } else {
-    // Mixed results
+  }
+  // Mixed results
+  else {
     let message = "";
-    if (added.length > 0)
-      message += `Added ${added.length} menu${added.length > 1 ? "s" : ""}`;
+    if (added.length > 0) {
+      message += t(
+        `toast.added_count_${added.length === 1 ? "one" : "other"}`,
+        {
+          count: added.length,
+        },
+      );
+    }
     if (duplicates.length > 0) {
       if (message) message += ", ";
-      message += `${duplicates.length} already existed`;
+      message += t(
+        `toast.duplicates_count_${duplicates.length === 1 ? "one" : "other"}`,
+        {
+          count: duplicates.length,
+        },
+      );
     }
     if (failed > 0) {
       if (message) message += ", ";
-      message += `${failed} failed`;
+      message += t(`toast.failed_count_${failed === 1 ? "one" : "other"}`, {
+        count: failed,
+      });
     }
     $toast.warning(message);
-    router.push("/");
+    router.push(localePath("/"));
   }
 };
 </script>

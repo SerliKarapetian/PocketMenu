@@ -2,6 +2,7 @@
 <template>
   <div
     class="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100"
+    :dir="isRtl ? 'rtl' : 'ltr'"
   >
     <!-- Navigation Bar -->
     <nav
@@ -16,18 +17,22 @@
               v-if="showBackButton && !isHomePage"
               @click="goBack"
               class="flex p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Go back"
+              :aria-label="$t('back')"
             >
-              <Icon name="mdi:arrow-left" class="w-5 h-5" />
+              <Icon
+                name="mdi:arrow-left"
+                class="w-5 h-5"
+                :class="{ 'rotate-180': isRtl }"
+              />
             </button>
 
             <NuxtLink
               v-else
-              to="/"
+              :to="localePath('/')"
               class="flex items-center gap-2 font-bold text-lg hover:opacity-70 transition"
             >
               <span class="text-2xl">📱</span>
-              <span class="hidden sm:inline">PocketMenu</span>
+              <span class="hidden sm:inline">{{ $t("app.title") }}</span>
             </NuxtLink>
           </div>
 
@@ -39,8 +44,11 @@
           </div>
 
           <!-- Right side - Actions -->
-          <div class="flex items-center gap-2 min-w-[100px] justify-end">
+          <div
+            class="flex items-center gap-1.5 sm:gap-2 min-w-[100px] justify-end"
+          >
             <themeSwitch v-if="showThemeToggle" />
+            <languageSwitch />
           </div>
         </div>
       </div>
@@ -54,13 +62,21 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
+
+// Call composables at top level
+const { locale, t } = useI18n();
 const route = useRoute();
 const router = useRouter();
-
-// Use the theme composable
 const { initTheme, listenForSystemThemeChanges } = useTheme();
 
-// Get layout configuration from route meta
+// Get localePath for links
+const localePath = useLocalePath();
+
+// Computed properties
+const isRtl = computed(() => locale.value === "fa");
+
+// Route config
 const routeConfig = computed(() => {
   return (
     (route.meta.layoutConfig as {
@@ -72,7 +88,6 @@ const routeConfig = computed(() => {
   );
 });
 
-// Computed properties from route meta
 const showNav = computed(() => routeConfig.value.showNav !== false);
 const showBackButton = computed(
   () => routeConfig.value.showBackButton !== false,
@@ -81,28 +96,30 @@ const showThemeToggle = computed(
   () => routeConfig.value.showThemeToggle !== false,
 );
 const pageTitle = computed(() => routeConfig.value.pageTitle || "");
-
-// Check if we're on the home page
 const isHomePage = computed(() => route.path === "/");
 
-// Go back function
+// Go back function - needs to handle locale in URL
 const goBack = () => {
   if (window.history.length > 1) {
     router.back();
   } else {
-    router.push("/");
+    router.push(localePath("/"));
   }
 };
 
-// Initialize theme on mount
+// Lifecycle hooks
 onMounted(() => {
-  // Initialize theme from localStorage or system preference
-  initTheme();
+  // Update document direction
+  if (process.client) {
+    const isRtl = locale.value === "fa";
+    document.documentElement.dir = isRtl ? "rtl" : "ltr";
+    document.documentElement.lang = locale.value;
+  }
 
-  // Listen for system theme changes (only if user hasn't set a preference)
+  // Initialize theme
+  initTheme();
   const cleanup = listenForSystemThemeChanges();
 
-  // Cleanup on component unmount
   onUnmounted(() => {
     cleanup();
   });

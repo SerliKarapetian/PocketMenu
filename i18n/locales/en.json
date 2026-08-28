@@ -1,0 +1,97 @@
+{
+  "app": {
+    "title": "PocketMenu"
+  },
+  "menu": {
+    "my_menus": "My Menus",
+    "add_menu": "Add Menu",
+    "search_menus": "Search menus...",
+    "no_menus": "No menus saved yet",
+    "add_first": "Add your first menu →",
+    "open": "Open Menu",
+    "edit": "Edit Menu",
+    "delete": "Delete Menu",
+    "options": "Menu options",
+    "viewing": "Viewing {name}",
+    "not_found": "Menu not found",
+    "added_date": "Added {date}",
+    "last_visited_date": "Last visited {date}"
+  },
+  "add": {
+    "or": "OR",
+    "paste_links": "Paste Menu Link(s)",
+    "paste_placeholder": "Paste one or multiple links here (one per line)",
+    "add_link_single": "Add Link",
+    "add_link_plural": "Add Links"
+  },
+  "sort": {
+    "newest": "Newest First",
+    "oldest": "Oldest First",
+    "az": "A → Z",
+    "za": "Z → A",
+    "last_visited": "Last Visited",
+    "sort_by": "Sort by"
+  },
+  "qr": {
+    "scan": "Scan QR Code",
+    "tap_to_scan": "Tap to Scan QR Code",
+    "camera_will_open": "Camera will open",
+    "cancel": "Cancel Scan",
+    "position_qr": "Position QR code in frame",
+    "processing": "Processing...",
+    "enter_url": "Enter the menu URL from the QR code:",
+    "permission_denied": "Camera access was denied. Please allow camera access in your browser settings and try again.",
+    "no_camera": "No camera found on this device. Please use the manual input option.",
+    "camera_error": "Failed to start camera: {error}. Please use the manual input option."
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "toggle": "Toggle theme"
+  },
+  "toast": {
+    "added": "\"{name}\" added successfully!",
+    "duplicate": "\"{name}\" already exists - updated last visited",
+    "invalid_url": "Invalid URL. Please check the link and try again.",
+    "added_one": "Added 1 menu successfully!",
+    "added_other": "Added {count} menus successfully!",
+    "added_with_duplicates_one": "Added 1 menu, {duplicates} already existed",
+    "added_with_duplicates_other": "Added {added} menus, {duplicates} already existed",
+    "all_duplicates_one": "1 menu already exists - updated last visited",
+    "all_duplicates_other": "All {count} menus already exist - updated last visited",
+    "added_with_failed_one": "Added 1 menu, {failed} failed",
+    "added_with_failed_other": "Added {added} menus, {failed} failed",
+    "all_failed_one": "Failed to add 1 menu. Please check your link.",
+    "all_failed_other": "Failed to add {count} menus. Please check your links.",
+    "added_count_one": "Added 1 menu",
+    "added_count_other": "Added {count} menus",
+    "duplicates_count_one": "1 already existed",
+    "duplicates_count_other": "{count} already existed",
+    "failed_count_one": "1 failed",
+    "failed_count_other": "{count} failed",
+    "updated": "\"{name}\" updated successfully!",
+    "update_failed": "Failed to update menu.",
+    "deleted": "\"{name}\" deleted"
+  },
+  "modal": {
+    "delete_title": "Delete Menu",
+    "delete_confirm": "Are you sure you want to delete",
+    "delete_confirm2": "?",
+    "delete_warning": "This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit_title": "Edit Menu",
+    "menu_name": "Menu Name",
+    "enter_menu_name": "Enter menu name",
+    "menu_url": "Menu URL",
+    "enter_menu_url": "https://example.com/menu",
+    "menu_image": "Menu Image",
+    "menu_preview": "Menu preview",
+    "paste_image_url": "Paste image URL",
+    "paste_image_hint": "Paste a direct image URL",
+    "save_changes": "Save Changes",
+    "error_name_required": "Please enter a menu name",
+    "error_url_required": "Please enter a menu URL"
+  },
+  "back": "Go back"
+}

@@ -1,0 +1,97 @@
+{
+  "app": {
+    "title": "PocketMenu"
+  },
+  "menu": {
+    "my_menus": "منوهای من",
+    "add_menu": "افزودن منو",
+    "search_menus": "جستجوی منوها...",
+    "no_menus": "هنوز منویی ذخیره نشده است",
+    "add_first": "اولین منوی خود را اضافه کنید ←",
+    "open": "باز کردن منو",
+    "edit": "ویرایش منو",
+    "delete": "حذف منو",
+    "options": "گزینه‌های منو",
+    "viewing": "مشاهده {name}",
+    "not_found": "منو یافت نشد",
+    "added_date": "افزوده شده در {date}",
+    "last_visited_date": "آخرین بازدید {date}"
+  },
+  "add": {
+    "or": "یا",
+    "paste_links": "لینک‌های منو را وارد کنید",
+    "paste_placeholder": "یک یا چند لینک را اینجا قرار دهید (هر خط یک لینک)",
+    "add_link_single": "افزودن لینک",
+    "add_link_plural": "افزودن لینک‌ها"
+  },
+  "sort": {
+    "newest": "جدیدترین",
+    "oldest": "قدیمی‌ترین",
+    "az": "الف → ی",
+    "za": "ی → الف",
+    "last_visited": "آخرین بازدید",
+    "sort_by": "مرتب‌سازی بر اساس"
+  },
+  "qr": {
+    "scan": "اسکن کد QR",
+    "tap_to_scan": "برای اسکن کد QR ضربه بزنید",
+    "camera_will_open": "دوربین باز خواهد شد",
+    "cancel": "لغو اسکن",
+    "position_qr": "کد QR را در قاب قرار دهید",
+    "processing": "در حال پردازش...",
+    "enter_url": "لینک منو را از کد QR وارد کنید:",
+    "permission_denied": "دسترسی به دوربین رد شد. لطفاً در تنظیمات مرورگر خود دسترسی دوربین را فعال کنید.",
+    "no_camera": "دوربینی در این دستگاه یافت نشد. لطفاً از گزینه ورود دستی استفاده کنید.",
+    "camera_error": "خطا در راه‌اندازی دوربین: {error}. لطفاً از گزینه ورود دستی استفاده کنید."
+  },
+  "theme": {
+    "light": "روشن",
+    "dark": "تاریک",
+    "toggle": "تغییر تم"
+  },
+  "toast": {
+    "added": "\"{name}\" با موفقیت اضافه شد!",
+    "duplicate": "\"{name}\" قبلاً وجود دارد - آخرین بازدید به‌روز شد",
+    "invalid_url": "آدرس نامعتبر است. لطفاً لینک را بررسی کنید.",
+    "added_multiple_one": "۱ منو با موفقیت اضافه شد!",
+    "added_multiple_other": "{count} منو با موفقیت اضافه شد!",
+    "added_with_duplicates_one": "۱ منو اضافه شد، {duplicates} منو قبلاً وجود داشت",
+    "added_with_duplicates_other": "{added} منو اضافه شد، {duplicates} منو قبلاً وجود داشت",
+    "all_duplicates_one": "۱ منو قبلاً وجود دارد - آخرین بازدید به‌روز شد",
+    "all_duplicates_other": "همه {count} منو قبلاً وجود دارند - آخرین بازدید به‌روز شد",
+    "added_with_failed_one": "۱ منو اضافه شد، {failed} منو ناموفق بود",
+    "added_with_failed_other": "{added} منو اضافه شد، {failed} منو ناموفق بود",
+    "all_failed_one": "افزودن ۱ منو ناموفق بود. لطفاً لینک را بررسی کنید.",
+    "all_failed_other": "افزودن {count} منو ناموفق بود. لطفاً لینک‌ها را بررسی کنید.",
+    "added_count_one": "۱ منو اضافه شد",
+    "added_count_other": "{count} منو اضافه شد",
+    "duplicates_count_one": "۱ منو قبلاً وجود داشت",
+    "duplicates_count_other": "{count} منو قبلاً وجود داشت",
+    "failed_count_one": "۱ منو ناموفق بود",
+    "failed_count_other": "{count} منو ناموفق بود",
+    "updated": "\"{name}\" با موفقیت به‌روز شد!",
+    "update_failed": "به‌روزرسانی منو ناموفق بود.",
+    "deleted": "\"{name}\" حذف شد"
+  },
+  "modal": {
+    "delete_title": "حذف منو",
+    "delete_confirm": "آیا مطمئن هستید که می‌خواهید",
+    "delete_confirm2": "را حذف کنید؟",
+    "delete_warning": "این عمل قابل بازگشت نیست.",
+    "cancel": "لغو",
+    "delete": "حذف",
+    "edit_title": "ویرایش منو",
+    "menu_name": "نام منو",
+    "enter_menu_name": "نام منو را وارد کنید",
+    "menu_url": "لینک منو",
+    "enter_menu_url": "https://example.com/menu",
+    "menu_image": "تصویر منو",
+    "menu_preview": "پیش‌نمایش منو",
+    "paste_image_url": "لینک تصویر را وارد کنید",
+    "paste_image_hint": "یک لینک مستقیم تصویر وارد کنید",
+    "save_changes": "ذخیره تغییرات",
+    "error_name_required": "لطفاً نام منو را وارد کنید",
+    "error_url_required": "لطفاً لینک منو را وارد کنید"
+  },
+  "back": "بازگشت"
+}

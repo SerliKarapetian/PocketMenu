@@ -5,17 +5,20 @@
       v-if="currentMenu"
       :src="currentMenu.url"
       class="flex-1 w-full border-none"
-      title="Restaurant Menu"
+      :title="$t('menu.viewing', { name: currentMenu.name })"
       allowfullscreen
     />
     <div v-else class="flex-1 flex items-center justify-center">
-      <p class="text-xl text-gray-500">Menu not found</p>
+      <p class="text-xl text-gray-500">{{ $t("menu.not_found") }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useMenuStore } from "~/stores/menu";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 definePageMeta({
   layout: "default",
