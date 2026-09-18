@@ -21,11 +21,17 @@
       </div>
 
       <!-- Menu Button -->
-      <div class="absolute top-2 right-2 z-10">
+      <div
+        class="absolute top-2 z-10"
+        :class="{
+          'left-2': isRtl,
+          'right-2': !isRtl,
+        }"
+      >
         <button
           @click.stop="toggleMenu"
           class="p-1.5 flex rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
-          aria-label="Menu options"
+          :aria-label="$t('menu.options')"
           ref="buttonRef"
         >
           <Icon name="mdi:dots-vertical" class="w-5 h-5" />
@@ -42,9 +48,11 @@
       </h3>
 
       <div class="text-xs text-gray-500 mt-auto space-y-0.5">
-        <p>Added {{ formatDate(menu.addedAt) }}</p>
+        <p>{{ $t("menu.added_date", { date: formatDate(menu.addedAt) }) }}</p>
         <p v-if="menu.lastVisited" class="text-gray-400">
-          Last visited {{ formatDate(menu.lastVisited) }}
+          {{
+            $t("menu.last_visited_date", { date: formatDate(menu.lastVisited) })
+          }}
         </p>
       </div>
     </div>
@@ -54,31 +62,37 @@
       <div
         v-if="dropdownStore.isOpen(menu.id)"
         ref="dropdownRef"
-        class="fixed z-[100] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden py-1 min-w-[200px]"
+        class="fixed z-[100] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden py-1 min-w-[180px]"
         :style="dropdownStyle"
         @click.stop
       >
         <NuxtLink
-          :to="`/menu/${menu.id}`"
+          :to="localePath(`/menu/${menu.id}`)"
           class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          :class="{
+            'flex-row-reverse': !isRtl,
+          }"
           @click="close"
         >
           <Icon
             name="mdi:eye"
             class="w-5 h-5 text-gray-600 dark:text-gray-400"
           />
-          <span>Open Menu</span>
+          <span>{{ $t("menu.open") }}</span>
         </NuxtLink>
 
         <button
           @click="openEditModal"
           class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          :class="{
+            'flex-row-reverse': !isRtl,
+          }"
         >
           <Icon
             name="mdi:pencil"
             class="w-5 h-5 text-gray-600 dark:text-gray-400"
           />
-          <span>Edit Menu</span>
+          <span>{{ $t("menu.edit") }}</span>
         </button>
 
         <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
@@ -86,9 +100,12 @@
         <button
           @click="openDeleteModal"
           class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
+          :class="{
+            'flex-row-reverse': !isRtl,
+          }"
         >
           <Icon name="mdi:delete" class="w-5 h-5" />
-          <span>Delete Menu</span>
+          <span>{{ $t("menu.delete") }}</span>
         </button>
       </div>
     </Teleport>
@@ -117,8 +134,12 @@
 import type { Menu } from "~/types/menu";
 import { useMenuStore } from "~/stores/menu";
 import { useDropdownStore } from "~/stores/dropdown";
+import { useI18n } from "vue-i18n";
 
+const { t, locale } = useI18n();
 const { $toast } = useNuxtApp();
+const localePath = useLocalePath();
+const isRtl = computed(() => locale.value === "fa");
 
 const props = defineProps<{
   menu: Menu;
@@ -160,7 +181,7 @@ const openMenu = (e: MouseEvent) => {
   // Update last visited time
   menuStore.updateLastVisited(props.menu.id);
   // Navigate to the menu page
-  router.push(`/menu/${props.menu.id}`);
+  router.push(localePath(`/menu/${props.menu.id}`));
 };
 
 const positionDropdown = () => {
@@ -172,11 +193,28 @@ const positionDropdown = () => {
     pad = 8;
 
   let top = rect.bottom + pad;
-  let left = rect.right - w;
 
-  if (top + h > window.innerHeight - pad) top = rect.top - h - pad;
-  if (left < pad) left = pad;
-  if (left + w > window.innerWidth - pad) left = window.innerWidth - w - pad;
+  // Position based on RTL
+  let left: number;
+  if (isRtl.value) {
+    // For RTL: align to the left of the button
+    left = rect.left;
+  } else {
+    // For LTR: align to the right of the button
+    left = rect.right - w;
+  }
+
+  // Adjust if dropdown goes off screen
+  if (top + h > window.innerHeight - pad) {
+    top = rect.top - h - pad;
+  }
+
+  if (left < pad) {
+    left = pad;
+  }
+  if (left + w > window.innerWidth - pad) {
+    left = window.innerWidth - w - pad;
+  }
 
   dropdownStyle.value = { top: `${top}px`, left: `${left}px` };
 };
@@ -205,9 +243,9 @@ const saveEdit = (updatedMenu: Menu) => {
   const success = menuStore.updateMenu(updatedMenu);
 
   if (success) {
-    $toast.success(`"${updatedMenu.name}" updated successfully!`);
+    $toast.success(t("toast.updated", { name: updatedMenu.name }));
   } else {
-    $toast.error("Failed to update menu.");
+    $toast.error(t("toast.update_failed"));
   }
   closeEditModal();
 };
@@ -224,7 +262,7 @@ const closeDeleteModal = () => {
 const confirmDelete = () => {
   closeDeleteModal();
   emit("delete", props.menu.id);
-  $toast.success(`"${props.menu.name}" deleted`);
+  $toast.success(t("toast.deleted", { name: props.menu.name }));
 };
 
 // Close dropdown when clicking outside

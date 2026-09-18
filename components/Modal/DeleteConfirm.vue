@@ -9,27 +9,29 @@
     >
       <div class="text-center">
         <div class="text-5xl mb-4">🗑️</div>
-        <h3 class="text-xl font-bold mb-2">Delete Menu</h3>
+        <h3 class="text-xl font-bold mb-2">{{ $t("modal.delete_title") }}</h3>
         <p class="text-gray-500 dark:text-gray-400 mb-6">
-          Are you sure you want to delete "<span
-            class="font-semibold text-gray-900 dark:text-white"
-            >{{ menuName }}</span
-          >"?<br />
-          This action cannot be undone.
+          {{ $t("modal.delete_confirm") }}
+          <span class="font-semibold text-gray-900 dark:text-white">{{
+            menuName
+          }}</span>
+          {{ $t("modal.delete_confirm2") }}
+          <br />
+          {{ $t("modal.delete_warning") }}
         </p>
 
-        <div class="flex gap-3">
+        <div class="flex gap-3" :class="{ 'flex-row-reverse': isRtl }">
           <button
             @click="close"
             class="flex-1 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 py-3 rounded-2xl font-medium hover:bg-gray-300 dark:hover:bg-gray-700 transition"
           >
-            Cancel
+            {{ $t("modal.cancel") }}
           </button>
           <button
             @click="confirmDelete"
             class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-2xl font-medium transition active:scale-95"
           >
-            Delete
+            {{ $t("modal.delete") }}
           </button>
         </div>
       </div>
@@ -38,6 +40,11 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
+
+const { t, locale } = useI18n();
+const isRtl = computed(() => locale.value === "fa");
+
 interface Props {
   isOpen: boolean;
   menuName: string;

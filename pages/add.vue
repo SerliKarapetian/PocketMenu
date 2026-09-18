@@ -1,6 +1,9 @@
+<!-- pages/add.vue -->
 <template>
   <div class="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
-    <h1 class="text-3xl sm:text-4xl font-bold mb-8">Add New Menu</h1>
+    <h1 class="text-3xl sm:text-4xl font-bold mb-8">
+      {{ $t("menu.add_menu") }}
+    </h1>
 
     <div class="space-y-10">
       <!-- QR Scanner -->
@@ -14,9 +17,9 @@
           ></div>
         </div>
         <div class="relative flex justify-center">
-          <span class="bg-white dark:bg-gray-900 px-6 text-sm text-gray-500"
-            >OR</span
-          >
+          <span class="bg-white dark:bg-gray-900 px-6 text-sm text-gray-500">{{
+            $t("add.or")
+          }}</span>
         </div>
       </div>
 
@@ -28,6 +31,11 @@
 
 <script setup lang="ts">
 import { useMenuStore } from "~/stores/menu";
+import { useI18n } from "vue-i18n";
+
+const { t, locale } = useI18n();
+const localePath = useLocalePath();
+const isRtl = computed(() => locale.value === "fa");
 
 definePageMeta({
   layout: "default",
@@ -46,66 +54,123 @@ const handleScanned = (url: string) => {
 
   if (result) {
     if (result.isDuplicate) {
-      $toast.info(
-        `"${result.menu.name}" already exists - updated last visited`,
-      );
+      $toast.info(t("toast.duplicate", { name: result.menu.name }));
     } else {
-      $toast.success(`"${result.menu.name}" added successfully!`);
+      $toast.success(t("toast.added", { name: result.menu.name }));
     }
-    router.push("/");
+    router.push(localePath("/"));
   } else {
-    $toast.error("Invalid URL. Please check the link and try again.");
+    $toast.error(t("toast.invalid_url"));
   }
 };
 
 const addLinks = (urls: string[]) => {
   const { added, duplicates, failed } = menuStore.addMultipleMenus(urls);
 
-  // different scenarios
+  // Get the first added menu name for single item messages
+  const firstAddedName = added.length > 0 ? added[0].name : "";
+  const firstDuplicateName = duplicates.length > 0 ? duplicates[0].name : "";
+
+  // All added successfully
   if (added.length > 0 && duplicates.length === 0 && failed === 0) {
-    // All added successfully
-    $toast.success(
-      `Added ${added.length} menu${added.length > 1 ? "s" : ""} successfully!`,
-    );
-    router.push("/");
-  } else if (added.length > 0 && duplicates.length > 0 && failed === 0) {
-    // Some added, some duplicates
-    $toast.warning(
-      `Added ${added.length} menu${added.length > 1 ? "s" : ""}, ${duplicates.length} already existed`,
-    );
-    router.push("/");
-  } else if (added.length === 0 && duplicates.length > 0 && failed === 0) {
-    // All duplicates
-    $toast.info(
-      `All ${duplicates.length} menu${duplicates.length > 1 ? "s" : ""} already exist - updated last visited`,
-    );
-    router.push("/");
-  } else if (added.length > 0 && duplicates.length === 0 && failed > 0) {
-    // Some added, some failed
-    $toast.warning(
-      `Added ${added.length} menu${added.length > 1 ? "s" : ""}, ${failed} failed`,
-    );
-    router.push("/");
-  } else if (added.length === 0 && duplicates.length === 0 && failed > 0) {
-    // All failed
-    $toast.error(
-      `Failed to add ${failed} menu${failed > 1 ? "s" : ""}. Please check your links.`,
-    );
-  } else {
-    // Mixed results
-    let message = "";
-    if (added.length > 0)
-      message += `Added ${added.length} menu${added.length > 1 ? "s" : ""}`;
+    if (added.length === 1) {
+      $toast.success(t("toast.added_single", { name: firstAddedName }));
+    } else {
+      $toast.success(t("toast.added_multiple", { count: added.length }));
+    }
+    router.push(localePath("/"));
+  }
+  // Some added, some duplicates
+  else if (added.length > 0 && duplicates.length > 0 && failed === 0) {
+    if (added.length === 1) {
+      $toast.warning(
+        t("toast.added_with_duplicates_single", {
+          name: firstAddedName,
+          duplicates: duplicates.length,
+        }),
+      );
+    } else {
+      $toast.warning(
+        t("toast.added_with_duplicates_multiple", {
+          added: added.length,
+          duplicates: duplicates.length,
+        }),
+      );
+    }
+    router.push(localePath("/"));
+  }
+  // All duplicates
+  else if (added.length === 0 && duplicates.length > 0 && failed === 0) {
+    if (duplicates.length === 1) {
+      $toast.info(
+        t("toast.all_duplicates_single", { name: firstDuplicateName }),
+      );
+    } else {
+      $toast.info(
+        t("toast.all_duplicates_multiple", { count: duplicates.length }),
+      );
+    }
+    router.push(localePath("/"));
+  }
+  // Some added, some failed
+  else if (added.length > 0 && duplicates.length === 0 && failed > 0) {
+    if (added.length === 1) {
+      $toast.warning(
+        t("toast.added_with_failed_single", {
+          name: firstAddedName,
+          failed: failed,
+        }),
+      );
+    } else {
+      $toast.warning(
+        t("toast.added_with_failed_multiple", {
+          added: added.length,
+          failed: failed,
+        }),
+      );
+    }
+    router.push(localePath("/"));
+  }
+  // All failed
+  else if (added.length === 0 && duplicates.length === 0 && failed > 0) {
+    if (failed === 1) {
+      // For single failure, show the first URL
+      const firstFailedUrl = urls.length > 0 ? urls[0] : "unknown";
+      $toast.error(t("toast.all_failed_single", { name: firstFailedUrl }));
+    } else {
+      $toast.error(t("toast.all_failed_multiple", { count: failed }));
+    }
+  }
+  // Mixed results
+  else {
+    // Build message based on what we have
+    let messageParts = [];
+    if (added.length > 0) {
+      messageParts.push(
+        t(`toast.added_count_${added.length === 1 ? "one" : "other"}`, {
+          count: added.length,
+        }),
+      );
+    }
     if (duplicates.length > 0) {
-      if (message) message += ", ";
-      message += `${duplicates.length} already existed`;
+      messageParts.push(
+        t(
+          `toast.duplicates_count_${duplicates.length === 1 ? "one" : "other"}`,
+          {
+            count: duplicates.length,
+          },
+        ),
+      );
     }
     if (failed > 0) {
-      if (message) message += ", ";
-      message += `${failed} failed`;
+      messageParts.push(
+        t(`toast.failed_count_${failed === 1 ? "one" : "other"}`, {
+          count: failed,
+        }),
+      );
     }
-    $toast.warning(message);
-    router.push("/");
+    $toast.warning(messageParts.join(", "));
+    router.push(localePath("/"));
   }
 };
 </script>

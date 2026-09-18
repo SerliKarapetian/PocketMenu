@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label class="block text-sm font-medium mb-3">Scan QR Code</label>
+    <label class="block text-sm font-medium mb-3">{{ $t("qr.scan") }}</label>
 
     <!-- Scanner Container -->
     <div
@@ -15,16 +15,32 @@
         <div class="absolute inset-0 flex items-center justify-center">
           <div class="w-48 h-48 border-2 border-white rounded-lg relative">
             <div
-              class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-white"
+              class="absolute top-0 w-8 h-8 border-t-2 border-white"
+              :class="{
+                'left-0 border-l-2': !isRtl,
+                'right-0 border-r-2': isRtl,
+              }"
             ></div>
             <div
-              class="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-white"
+              class="absolute top-0 w-8 h-8 border-t-2 border-white"
+              :class="{
+                'right-0 border-r-2': !isRtl,
+                'left-0 border-l-2': isRtl,
+              }"
             ></div>
             <div
-              class="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-white"
+              class="absolute bottom-0 w-8 h-8 border-b-2 border-white"
+              :class="{
+                'left-0 border-l-2': !isRtl,
+                'right-0 border-r-2': isRtl,
+              }"
             ></div>
             <div
-              class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-white"
+              class="absolute bottom-0 w-8 h-8 border-b-2 border-white"
+              :class="{
+                'right-0 border-r-2': !isRtl,
+                'left-0 border-l-2': isRtl,
+              }"
             ></div>
             <div class="absolute inset-0 flex items-center justify-center">
               <div class="w-full h-0.5 bg-blue-500 animate-scan"></div>
@@ -37,8 +53,8 @@
       <div
         class="absolute top-4 left-1/2 -translate-x-1/2 bg-black/60 text-white px-4 py-2 rounded-full text-sm z-10"
       >
-        <span v-if="isProcessing">Processing...</span>
-        <span v-else>Position QR code in frame</span>
+        <span v-if="isProcessing">{{ $t("qr.processing") }}</span>
+        <span v-else>{{ $t("qr.position_qr") }}</span>
       </div>
 
       <!-- Cancel button -->
@@ -46,7 +62,7 @@
         @click="stopScanning"
         class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full text-sm font-medium transition z-10"
       >
-        Cancel Scan
+        {{ $t("qr.cancel") }}
       </button>
     </div>
 
@@ -57,14 +73,22 @@
       class="w-full h-40 sm:h-44 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-3xl flex flex-col items-center justify-center hover:border-black dark:hover:border-white active:scale-95 transition group"
     >
       <span class="text-5xl mb-3 group-hover:scale-110 transition">📷</span>
-      <span class="font-medium text-base sm:text-lg">Tap to Scan QR Code</span>
-      <span class="text-xs text-gray-500 mt-1">Camera will open</span>
+      <span class="font-medium text-base sm:text-lg">{{
+        $t("qr.tap_to_scan")
+      }}</span>
+      <span class="text-xs text-gray-500 mt-1">{{
+        $t("qr.camera_will_open")
+      }}</span>
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t, locale } = useI18n();
+const isRtl = computed(() => locale.value === "fa");
 
 const emit = defineEmits<{
   scanned: [url: string];
@@ -84,7 +108,7 @@ const hasCameraSupport = () => {
 const startScanning = async () => {
   if (!hasCameraSupport()) {
     // Fallback for browsers without camera support
-    const fakeUrl = prompt("Enter the menu URL from the QR code:");
+    const fakeUrl = prompt(t("qr.enter_url"));
     if (fakeUrl) emit("scanned", fakeUrl);
     return;
   }
@@ -120,24 +144,18 @@ const startScanning = async () => {
       errorMessage.includes("NotAllowedError") ||
       errorMessage.includes("Permission denied")
     ) {
-      alert(
-        "Camera access was denied. Please allow camera access in your browser settings and try again.",
-      );
+      alert(t("qr.permission_denied"));
     } else if (
       errorMessage.includes("NotFoundError") ||
       errorMessage.includes("No camera found")
     ) {
-      alert(
-        "No camera found on this device. Please use the manual input option.",
-      );
+      alert(t("qr.no_camera"));
     } else {
-      alert(
-        `Failed to start camera: ${errorMessage}. Please use the manual input option.`,
-      );
+      alert(t("qr.camera_error", { error: errorMessage }));
     }
 
     // Fallback to manual input
-    const fakeUrl = prompt("Enter the menu URL from the QR code:");
+    const fakeUrl = prompt(t("qr.enter_url"));
     if (fakeUrl) emit("scanned", fakeUrl);
   }
 };
